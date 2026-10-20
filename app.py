@@ -245,12 +245,17 @@ with tab2:
             effective_bits = 128
             algo_type = "Asymmetric"
             
-        custom_ops = st.number_input(
-            "全球超級電腦總算力估計 (Operations / second)",
-            value=1_000_000_000_000_000_000, # 1 ExaFLOP
-            format="%e",
-            help="1 ExaFLOPS = 10^18 次計算/秒 (約等於目前全球頂級超級電腦如 Frontier/El Capitan 規模)"
+        # 修正：將數字範圍縮小至 JavaScript 安全整數範圍內 (改用 ExaFLOPS 為單位)
+        exaflops = st.number_input(
+            "全球頂級超級電腦總算力估計 (單位：ExaFLOPS, 1 ExaFLOPS = 10^18 次計算/秒)",
+            value=1.0,
+            min_value=0.0001,
+            max_value=1000000.0,
+            step=0.5,
+            help="目前最頂尖超算（如 Frontier / El Capitan）約為 1 ~ 2 ExaFLOPS"
         )
+        
+        custom_ops = exaflops * 1e18  # 在 Python 後端轉換為實際運算次數
 
     with col_key_result:
         st.subheader("物理極限與破解時間估算")
@@ -310,6 +315,6 @@ with tab3:
         2. **Key Stretching (慢雜湊)**：
            - 使用 **Argon2id**, **bcrypt**, 或 **PBKDF2**，刻意增加計算開銷與記憶體需求，拉長攻擊者暴力破解的時間。
         3. **量子計算對密碼學的影響**：
-           - **Grover 演算法**：使對稱加密 (AES) 強度減半 (AES-256 降至 128-bit 安全度，知識上依然安全)。
+           - **Grover 演算法**：使對稱加密 (AES) 強度減半 (AES-256 降至 128-bit 安全度，依然安全)。
            - **Shor 演算法**：可在多項式時間內破解 RSA/ECC，因此業界正全力推動**後量子密碼學 (PQC, Post-Quantum Cryptography)**。
         """)
